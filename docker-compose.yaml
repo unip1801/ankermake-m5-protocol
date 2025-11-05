@@ -1,6 +1,5 @@
 services:
     ankerctl:
-        image: anselor/ankerctl:exile-latest
         container_name: ankerctl
         restart: unless-stopped
         build: .
@@ -11,10 +10,7 @@ services:
 
         # bind to localhost by default
         environment:
-            - FLASK_HOST={$FLASK_HOST:-127.0.0.1}
+            - FLASK_HOST=${FLASK_HOST:-127.0.0.1}
             - FLASK_PORT=${FLASK_PORT:-4470}
         volumes:
-            - ${ANKERCTL_DATA:-ankerctl_vol}:/root/.config/ankerctl
-
-volumes:
-    ankerctl_vol:
+            - ./ankerctl_data:/root/.config/ankerctl
