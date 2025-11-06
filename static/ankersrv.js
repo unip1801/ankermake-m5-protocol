@@ -618,7 +618,20 @@ $(function () {
         }
     }
 
-    // Add event listeners for Retract and Extrude buttons
+    let currentAction = null; // Tracks the current action ('retract' or 'extrude')
+
+    function updateButtonProgress(buttonId, progress) {
+        $(buttonId).text(`${progress}%`).prop("disabled", true);
+    }
+
+    function resetButtons() {
+       $("#retract-button, #extrude-button").each(function () {
+            $(this).text($(this).attr("title")).prop("disabled", false);
+        });
+        $("#stop-button").prop("disabled", true);
+        currentAction = null;
+    }
+
     $("#retract-button").on("click", function () {
         const message_data = {
             commandType: 1023,
@@ -629,6 +642,10 @@ $(function () {
             },
         };
         sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
+        currentAction = "retract";
+        $("#retract-button").prop("disabled", true);
+        $("#extrude-button").prop("disabled", true);
+        $("#stop-button").prop("disabled", false);
     });
 
     $("#extrude-button").on("click", function () {
@@ -641,6 +658,41 @@ $(function () {
             },
         };
         sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
+        currentAction = "extrude";
+        $("#retract-button").prop("disabled", true);
+        $("#extrude-button").prop("disabled", true);
+        $("#stop-button").prop("disabled", false);
     });
+
+    $("#stop-button").on("click", function () {
+        const message_data = {
+            commandType: 1023,
+            enter_or_quit_materiel: {
+                value: 0,
+                progress: 100,
+                stepLen: 80,
+            },
+        };
+        sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
+        resetButtons();
+    });
+
+    sockets.ctrl.message = function (ev) {
+        const data = JSON.parse(ev.data);
+        if (data.commandType === 1023 && data.enter_or_quit_materiel) {
+            const progress = data.enter_or_quit_materiel.progress;
+            if (currentAction === "retract") {
+                updateButtonProgress("#retract-button", progress);
+            } else if (currentAction === "extrude") {
+                updateButtonProgress("#extrude-button", progress);
+            }
+
+            if (progress >= 100) {
+                resetButtons();
+            }
+        }
+
+        // ...existing message handling...
+    };
 
 });
