@@ -618,4 +618,29 @@ $(function () {
         }
     }
 
+    // Add event listeners for Retract and Extrude buttons
+    $("#retract-button").on("click", function () {
+        const message_data = {
+            commandType: 1023,
+            enter_or_quit_materiel: {
+                value: 3,
+                progress: 0,
+                stepLen: 80,
+            },
+        };
+        sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
+    });
+
+    $("#extrude-button").on("click", function () {
+        const message_data = {
+            commandType: 1023,
+            enter_or_quit_materiel: {
+                value: 2,
+                progress: 0,
+                stepLen: 80,
+            },
+        };
+        sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
+    });
+
 });
