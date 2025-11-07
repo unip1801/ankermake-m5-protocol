@@ -634,13 +634,12 @@ $(function () {
 
     $("#retract-button").on("click", function () {
         const message_data = {
-            commandType: 1023,
-            enter_or_quit_materiel: {
-                value: 3,
-                progress: 0,
-                stepLen: 80,
-            },
+            commandType: 1023,  // ZZ_MQTT_CMD_ENTER_OR_QUIT_MATERIEL
+            value: 3,           // 3 = RETRACT (flat format like mobile app)
+            progress: 0,        // Starting progress
+            stepLen: 80,        // Step length
         };
+        console.log("RETRACT - Sending flat format:", message_data);
         sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
         currentAction = "retract";
         $("#retract-button").prop("disabled", true);
@@ -650,13 +649,12 @@ $(function () {
 
     $("#extrude-button").on("click", function () {
         const message_data = {
-            commandType: 1023,
-            enter_or_quit_materiel: {
-                value: 2,
-                progress: 0,
-                stepLen: 80,
-            },
+            commandType: 1023,  // ZZ_MQTT_CMD_ENTER_OR_QUIT_MATERIEL
+            value: 2,           // 2 = START extrusion (flat format like mobile app)
+            progress: 0,        // Starting progress  
+            stepLen: 80,        // Step length
         };
+        console.log("EXTRUDE - Sending flat format:", message_data);
         sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
         currentAction = "extrude";
         $("#retract-button").prop("disabled", true);
@@ -666,29 +664,34 @@ $(function () {
 
     $("#stop-button").on("click", function () {
         const message_data = {
-            commandType: 1023,
-            enter_or_quit_materiel: {
-                value: 0,
-                progress: 100,
-                stepLen: 80,
-            },
+            value: 0,           // 0 = STOP extrusion (flat format like mobile app)
+            progress: 100,      // Progress complete
+            stepLen: 80,        // Step length
+            commandType: 1023,  // ZZ_MQTT_CMD_ENTER_OR_QUIT_MATERIEL 
         };
+        console.log("STOP - Sending flat format:", message_data);
         sockets.ctrl.ws.send(JSON.stringify({ mqtt: message_data }));
         resetButtons();
     });
 
     sockets.ctrl.message = function (ev) {
         const data = JSON.parse(ev.data);
-        if (data.commandType === 1023 && data.enter_or_quit_materiel) {
-            const progress = data.enter_or_quit_materiel.progress;
-            if (currentAction === "retract") {
-                updateButtonProgress("#retract-button", progress);
-            } else if (currentAction === "extrude") {
-                updateButtonProgress("#extrude-button", progress);
-            }
+        if (data.commandType === 1023) {
+            // Handle both nested format (our commands) and flat format (responses)
+            const progress = data.enter_or_quit_materiel ? 
+                data.enter_or_quit_materiel.progress : 
+                data.progress;
+            
+            if (progress !== undefined) {
+                if (currentAction === "retract") {
+                    updateButtonProgress("#retract-button", progress);
+                } else if (currentAction === "extrude") {
+                    updateButtonProgress("#extrude-button", progress);
+                }
 
-            if (progress >= 100) {
-                resetButtons();
+                if (progress >= 100) {
+                    resetButtons();
+                }
             }
         }
 

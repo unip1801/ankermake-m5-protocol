@@ -1,0 +1,43 @@
+{
+  "name": "AnkerMake M5 Protocol Dev Container",
+  "dockerFile": "../Dockerfile.dev",
+  "context": "..",
+  "runArgs": ["--privileged", "--network=host", "--name=ankermake-m5-dev"],
+  "workspaceFolder": "/app",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached"
+  ],
+  "postStartCommand": "bash /app/start-webserver.sh",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.terminal.activateEnvironment": false,
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-python.flake8",
+        "ms-python.black-formatter",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.vscode-json"
+      ]
+    }
+  },
+  "remoteUser": "root",
+  "forwardPorts": [4470, 8080],
+  "portsAttributes": {
+    "4470": {
+      "label": "AnkerMake Web Interface (Default)",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "AnkerMake Web Interface (Dev)",
+      "onAutoForward": "notify"
+    }
+  }
+}

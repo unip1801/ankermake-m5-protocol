@@ -511,4 +511,7 @@ def webserver(config, printer_index, host, port, insecure=False, **kwargs):
         app.config.update(kwargs)
         if cfg.printers:
             register_services(app)
-        app.run(host=host, port=port)
+        # Enable debug mode for development (auto-reload on file changes)
+        debug_mode = kwargs.get('debug', False) or host == '0.0.0.0'
+        app.run(host=host, port=port, debug=debug_mode,
+                use_reloader=debug_mode)

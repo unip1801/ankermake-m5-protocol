@@ -8,9 +8,9 @@ services:
         # printer, since it is an asymmetrical udp protocol.
         network_mode: host
 
-        # bind to localhost by default
+        # bind to all interfaces to allow remote access via SSH
         environment:
-            - FLASK_HOST=${FLASK_HOST:-127.0.0.1}
+            - FLASK_HOST=${FLASK_HOST:-0.0.0.0}
             - FLASK_PORT=${FLASK_PORT:-4470}
         volumes:
             - ./ankerctl_data:/root/.config/ankerctl

@@ -559,12 +559,15 @@ def webserver(env):
 
 
 @webserver.command("run", help="Run ankerctl webserver")
-@click.option("--host", default='127.0.0.1', envvar="FLASK_HOST", help="Network interface to bind to")
-@click.option("--port", default=4470, envvar="FLASK_PORT", help="Port to bind to")
+@click.option("--host", default='0.0.0.0', envvar="FLASK_HOST",
+              help="Network interface to bind to")
+@click.option("--port", default=4470, envvar="FLASK_PORT",
+              help="Port to bind to")
 @pass_env
 def webserver(env, host, port):
     import web
-    web.webserver(env.config, env.printer_index, host, port, env.insecure, pppp_dump=env.pppp_dump)
+    web.webserver(env.config, env.printer_index, host, port, env.insecure,
+                  pppp_dump=env.pppp_dump)
 
 
 if __name__ == "__main__":

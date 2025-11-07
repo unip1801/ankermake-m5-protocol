@@ -3,7 +3,7 @@
 if [ -f '.env' ]; then
   export $(grep -v '^#' .env | xargs)
 else
-  FLASK_HOST=127.0.0.1
+  FLASK_HOST=0.0.0.0
   FLASK_PORT=4470
   BUILD_IMAGE=""
   ANKERCTL_DATA=ankerctl_vol
